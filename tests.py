@@ -105,3 +105,21 @@ def test_remove_choice_by_invalid_id():
     question.add_choice('a', False)
     with pytest.raises(Exception):
         question.remove_choice_by_id(999)
+
+@pytest.fixture
+def multi_choice_question():
+    question = Question(title='fixture question', max_selections=3)
+    c1 = question.add_choice('A', True)
+    c2 = question.add_choice('B', False)
+    c3 = question.add_choice('C', True)
+    return question
+
+def test_fixture_correct_choices(multi_choice_question):
+    correct_ids = [c.id for c in multi_choice_question.choices if c.is_correct]
+    assert len(correct_ids) == 2
+    assert all(multi_choice_question.choices[i].is_correct for i in [0,2])
+
+def test_fixture_max_selections(multi_choice_question):
+    selected_ids = [c.id for c in multi_choice_question.choices]
+    with pytest.raises(Exception):
+        multi_choice_question.correct_selected_choices(selected_ids + [999])
